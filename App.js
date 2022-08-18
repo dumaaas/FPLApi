@@ -15,19 +15,27 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import LoginScreen from './src/screens/LoginScreen';
+import PlayerScreen from './src/screens/PlayerScreen';
+
 let ScreenHeight = Dimensions.get("window").height;
+const Stack = createNativeStackNavigator();
 
 
 function App() {
 
 return (
-      <SafeAreaView style={styles.bgColor}>
-        <StatusBar barStyle={'dark-content'} />
-        <ScrollView>
-            <LoginScreen/>
-        </ScrollView>
-      </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home" screenOptions={{
+        headerShown: false
+      }}>
+        <Stack.Screen name="Home" component={LoginScreen}/>
+        <Stack.Screen name="PlayerScreen" component={PlayerScreen}/>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

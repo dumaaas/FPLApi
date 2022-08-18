@@ -1,75 +1,144 @@
 import React, {useEffect, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, View, Dimensions, Pressable} from 'react-native';
+import {
+    Button,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    Dimensions,
+    Pressable,
+    ToastAndroid,
+    Alert,
+    TouchableOpacity,
+    SafeAreaView,
+    ScrollView
+} from 'react-native';
 import {getEvents} from '../services/EventsService';
 import {checkIfUserExist} from '../services/UserService';
 import LoginHeader from '../components/LoginHeader';
+import Toast from 'react-native-simple-toast';
+let ScreenHeight = Dimensions.get("window").height;
 
-function LoginScreen() {
+function LoginScreen({navigation}) {
 
     const [id, setId] = useState(0);
     const [user, setUser] = useState({});
-    const [userFound, setUserFound] = useState(false);
+    const [userFound, setUserFound] = useState(true);
 
-    useEffect(() => {
-    }, [])
-
-
-    const login = () => {
-        checkIfUserExist(id).then(res => res.json())
+    const login = (userId = 0) => {
+        var realId = id != 0 ? id : userId;
+        console.log(realId, 'hm?');
+        checkIfUserExist(realId).then(res => res.json())
             .then(json => {
                 if (json.detail !== 'Not found.') {
                     setUserFound(true);
-                    setUser(json);
+                    setId(0);
+                    navigation.navigate('PlayerScreen', {user: json});
                 } else {
                     setUserFound(false);
+                    setId(0);
+                    Toast.showWithGravity('User not found. Try again..', Toast.LONG, Toast.TOP);
                 }
             }).catch(error => {
             console.log('ERROR > ', error);
         });
     }
 
+    const players = [
+        {
+            name: 'Marko Dumnic',
+            id: 5541327
+        },
+        {
+            name: 'Milos Jovovic',
+            id: 5230382
+        },
+        {
+            name: 'Stefan Tomovic',
+            id: 5552932
+        },
+        {
+            name: 'Strahinja Kovacevic',
+            id: 4157253
+        },
+        {
+            name: 'Vojin Jovovic',
+            id: 5251393
+        }
+    ]
+
+    const onChangedText = (text) => {
+        setId( text.replace(/[^0-9]/g, ''))
+        console.log(text, 'text >>>')
+    }
+
     return (
-        <View>
-            <LoginHeader/>
-            <View style={styles.container}>
-                <Text style={styles.text}>Enter your manager_id:</Text>
-                <TextInput value={id} style={styles.input} onChangeText={(text) => setId(text)}></TextInput>
-                <Pressable onPress={login} style={styles.button}><Text style={styles.buttonText}>Login</Text></Pressable>
-                <Text style={styles.text}></Text>
-                {userFound ?
-                    <>
-                        <Text style={styles.text}>{user.favourite_team}</Text>
-                        <Text style={styles.text}>{JSON.stringify(user)}</Text>
-                    </>
-                    :
-                    <Text style={styles.errorText}>User not found</Text>
-                }
-            </View>
-        </View>
+        <SafeAreaView style={styles.bgColor}>
+            <ScrollView>
+                <LoginHeader/>
+                <View style={styles.container}>
+                    <Text style={styles.text}>Enter your manager_id:</Text>
+                    <TextInput value={id} style={styles.input} onChangeText={(text) => onChangedText(text)}></TextInput>
+                    <TouchableOpacity onPress={login} style={styles.button}><Text style={styles.buttonText}>Login</Text></TouchableOpacity>
+                    <Text style={styles.text}></Text>
+                    <View>
+                        <Text style={styles.secondaryHeader}>Our players</Text>
+                        <View style={styles.playersContainer}>
+                            {players.map((player, index) => {
+                                return (
+                                    <>
+                                        <TouchableOpacity key={index} onPress={() => {
+                                            login(player.id);
+                                        }}>
+                                            <Text style={styles.playerText}>{player.name}</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                )
+                            })}
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    bgColor: {
+        backgroundColor: '#37003c',
+        minHeight: ScreenHeight
+    },
+    playersContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    playerText: {
+        width: 180,
+        fontSize: 16,
+        marginTop: 8,
+        padding: 12,
+        backgroundColor: '#35BFFF',
+        borderRadius: 10,
+        textAlign: 'center',
+        color: '#37003c',
+    },
     container: {
         paddingHorizontal: 30,
         paddingVertical: 50,
         flex: 1,
         alignContent: 'center',
         height: '100%',
-
+    },
+    secondaryHeader: {
+        fontSize: 20,
+        textAlign: 'center',
+        color: 'white',
+        marginBottom: 20
     },
     text: {
         fontSize: 20,
         textAlign: 'center',
         color: 'white'
-    },
-    errorText: {
-        padding: 20,
-        borderRadius: 10,
-        backgroundColor: 'red',
-        textAlign: 'center',
-        width: '100%',
-        color: 'white',
     },
     input: {
         borderWidth: 1,
