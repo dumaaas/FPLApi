@@ -12,7 +12,7 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
         var player = findPlayerBootstrapDataById(player.element);
         var team = {};
         bootstrapStatic.teams.find((teamBootstrap) => {
-            if(player.team_code == teamBootstrap.code) {
+            if (player.team_code == teamBootstrap.code) {
                 team = teamBootstrap;
             }
         })
@@ -22,7 +22,7 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
     const findPlayerBootstrapDataById = (id) => {
         var staticPlayer = {};
         bootstrapStatic.elements.find((player) => {
-            if(player.id == id) {
+            if (player.id == id) {
                 staticPlayer = player;
             }
         });
@@ -33,7 +33,7 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
         var livePlayer = {};
 
         livePlayerData.map((player, index) => {
-            if(player.id == id) {
+            if (player.id == id) {
                 livePlayer = player;
             }
         });
@@ -48,8 +48,17 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
         setFullPlayerData(player);
     };
 
+    const findBenchPoints = () => {
+        var points = 0;
+        team.map((player) => {
+            points += findPlayerLiveData(player.element).stats.total_points;
+        })
+        return points;
+    }
+
     return (
         <View style={isBench ? styles.benchCourt : styles.defendersCourt}>
+            {isBench && <View style={styles.benchData}><Text style={styles.benchDataText}>Bench ({findBenchPoints()} points)</Text></View>}
             {
                 team.map((player, index) => {
                     var bootstrapPlayer = findPlayerBootstrapDataById(player.element);
@@ -67,17 +76,19 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
                                 {player.is_vice_captain && <Text style={styles.teamCaptain}>
                                     V
                                 </Text>}
-                                <Text style={styles.playerPoints}>{player.is_captain ? JSON.stringify(livePlayer.stats.total_points)*2 : JSON.stringify(livePlayer.stats.total_points)}</Text>
+                                <Text
+                                    style={styles.playerPoints}>{player.is_captain ? JSON.stringify(livePlayer.stats.total_points) * 2 : JSON.stringify(livePlayer.stats.total_points)}</Text>
                                 <Image
                                     style={{
                                         resizeMode: 'contain',
                                         alignSelf: 'center',
                                     }}
-                                    style={{ width: 40, height: 60 }}
-                                    source={{uri: 'https://resources.premierleague.com/premierleague/photos/players/110x140/p'+bootstrapPlayer.code+'.png'}}
+                                    style={{width: 40, height: 60}}
+                                    source={{uri: 'https://resources.premierleague.com/premierleague/photos/players/110x140/p' + bootstrapPlayer.code + '.png'}}
                                 />
                                 <View style={styles.playerCardBottom}>
-                                    <Text style={styles.playerName}>{bootstrapPlayer.web_name.length > 10 ? bootstrapPlayer.web_name.substring(0, 10)+'..' : bootstrapPlayer.web_name}</Text>
+                                    <Text
+                                        style={styles.playerName}>{bootstrapPlayer.web_name.length > 10 ? bootstrapPlayer.web_name.substring(0, 10) + '..' : bootstrapPlayer.web_name}</Text>
                                     <Text style={styles.playerTeam}>{findOpponentTeam(player).short_name}</Text>
                                 </View>
                             </View>
@@ -85,7 +96,7 @@ function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic
                     );
                 })
             }
-        </View>    )
+        </View>)
 }
 
 const styles = StyleSheet.create({
@@ -260,7 +271,7 @@ const styles = StyleSheet.create({
         width: 14,
         height: 14,
         fontSize: 10,
-        borderRadius: 14/2,
+        borderRadius: 14 / 2,
         backgroundColor: '#35BFFF',
         color: '#37003c',
         alignItems: 'center',
@@ -274,6 +285,26 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         marginBottom: 20
+    },
+    benchData: {
+        position: 'absolute',
+        top: -17, left: 0, right: 0, bottom: 0,
+        alignItems: 'center',
+    },
+    benchDataText: {
+        textAlign: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#00ff87',
+        color: 'rgb(55,0,60)',
+        fontWeight: '400',
+        borderWidth: 0.9,
+        borderRadius: 8,
+        fontSize: 10,
+        borderColor: 'rgb(55,0,60)',
+        padding: 8,
+        width: 120,
+        height: 30
     },
     text: {
         fontSize: 20,
@@ -333,7 +364,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         backgroundColor: 'white',
-        backgroundColor: 'rgba(0,0,0,0.5)'
+        backgroundColor: 'rgba(55,0,60,0.6)'
     },
     playerCard: {
         justifyContent: 'center',
@@ -341,6 +372,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.4)',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
     },
     playerCardBottom: {
         width: 60,
@@ -368,7 +401,7 @@ const styles = StyleSheet.create({
     teamCaptain: {
         width: 14,
         height: 14,
-        borderRadius: 14/2,
+        borderRadius: 14 / 2,
         fontSize: 8,
         backgroundColor: 'black',
         color: 'white',

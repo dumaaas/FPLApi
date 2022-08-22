@@ -10,25 +10,25 @@ function PlayerHeader({user}) {
     return (
         <View style={styles.playerTabs}>
             <View style={styles.playerTab}>
-                <Text>
+                <Text style={styles.playerTabText}>
                     {user.player_first_name} {user.player_last_name}
                 </Text>
                 <CountryFlag isoCode={user.player_region_iso_code_short} size={18}/>
 
             </View>
             <View style={styles.playerTab}>
-                <Text>
+                <Text style={styles.playerTabText}>
                     Gameweek {user.current_event}
                 </Text>
-                <Text style={styles.textBold}>
+                <Text style={[styles.playerTabText, styles.textBold]}>
                     {user.summary_event_points} points
                 </Text>
             </View>
             <View style={styles.playerTab}>
-                <Text>
+                <Text style={styles.playerTabText}>
                     Total points
                 </Text>
-                <Text style={styles.textBold}>
+                <Text style={[styles.playerTabText, styles.textBold]}>
                     {user.summary_overall_points} points
                 </Text>
             </View>
@@ -39,6 +39,9 @@ function PlayerHeader({user}) {
 const styles = StyleSheet.create({
     textBold: {
         fontWeight: '700',
+    },
+    playerTabText: {
+      color: '#37003c',
     },
     playerTabs: {
         flex: 1,

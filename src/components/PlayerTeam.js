@@ -331,6 +331,7 @@ const styles = StyleSheet.create({
     heightWindow: {
         minHeight: ScreenHeight,
         backgroundColor: '#37003c',
+        paddingTop: 10,
     },
     playersCourt: {
         alignItems: 'center',

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {
-    Alert, Modal, StyleSheet, Text, Pressable, View, Image
+    Alert, Modal, StyleSheet, Text, Pressable, View, Image, TouchableOpacity, TouchableWithoutFeedback
 } from 'react-native';
 
 function PlayerData({player, modalVisible, setModalVisible}) {
@@ -49,7 +49,8 @@ function PlayerData({player, modalVisible, setModalVisible}) {
                     setModalVisible(false);
                 }}
             >
-                <View style={styles.centeredView}>
+                <TouchableOpacity activeOpacity={0} onPressOut={() => setModalVisible(false)} style={styles.centeredView}>
+                    <TouchableWithoutFeedback>
                     <View style={styles.modalView}>
                         <View style={styles.modalHeader}>
                             <Pressable onPress={() => setModalVisible(false)} style={styles.closeBtn}>
@@ -197,7 +198,8 @@ function PlayerData({player, modalVisible, setModalVisible}) {
                             </View>
                         </View>
                     </View>
-                </View>
+                        </TouchableWithoutFeedback>
+                </TouchableOpacity>
             </Modal>
         </View>
     )
@@ -274,7 +276,8 @@ const styles = StyleSheet.create({
     },
     playerHeaderTeam: {
         fontSize: 12,
-        marginLeft: 8
+        marginLeft: 8,
+        color: '#7a7a7a'
     },
     centeredView: {
         flex: 1,
