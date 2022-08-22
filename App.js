@@ -20,6 +20,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from './src/screens/LoginScreen';
 import PlayerScreen from './src/screens/PlayerScreen';
+import LeagueScreen from './src/screens/LeagueScreen';
 
 let ScreenHeight = Dimensions.get("window").height;
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,7 @@ return (
       }}>
         <Stack.Screen name="Home" component={LoginScreen}/>
         <Stack.Screen name="PlayerScreen" component={PlayerScreen}/>
+        <Stack.Screen name="LeagueScreen" component={LeagueScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -60,7 +60,7 @@ function PlayerScreen({navigation, route}) {
                 <View style={styles.bgColor}>
                     <PlayerHeader user={route.params.user}/>
                     {activeTab == 1 && <PlayerDetails user={route.params.user}/>}
-                    {activeTab == 2 && <PlayerLeagues user={route.params.user}/>}
+                    {activeTab == 2 && <PlayerLeagues user={route.params.user} navigation={navigation}/>}
                     {activeTab == 3 && <PlayerTeam user={route.params.user} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData}/>}
                 </View>
             </ScrollView>

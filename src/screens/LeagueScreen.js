@@ -1,24 +1,40 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     StyleSheet,
+    SafeAreaView,
+    ScrollView,
     Text,
-    Dimensions,
     View,
-    Pressable
+    ImageBackground,
+    Image,
+    Dimensions,
+    Pressable,
+    TouchableOpacity
 } from 'react-native';
-import CountryFlag from "react-native-country-flag";
+
+import PlayerTabs from "../components/PlayerTabs";
+import PlayerDetails from "../components/PlayerDetails";
+import PlayerLeagues from "../components/PlayerLeagues";
+import PlayerHeader from "../components/PlayerHeader";
+import PlayerTeam from "../components/PlayerTeam";
+
+import Toast from 'react-native-simple-toast';
+
 let ScreenHeight = Dimensions.get("window").height;
-import {getLeague} from '../services/LeagueService';
 
-function PlayerLeagues({navigation, user}) {
+import {checkIfUserExist} from '../services/UserService';
 
-    const findLeagueAndNavigate = (id) => {
-        getLeague(id).then(res => res.json())
+function LeagueScreen({navigation, route}) {
+
+    const [leaguePlayers, setLeaguePlayers] = useState([]);
+
+    const login = (id) => {
+        checkIfUserExist(id).then(res => res.json())
             .then(json => {
                 if (json.detail !== 'Not found.') {
-                    navigation.navigate('LeagueScreen', {league: json})
+                    navigation.navigate('PlayerScreen', {user: json});
                 } else {
-                    Toast.showWithGravity('League not found. Try again..', Toast.LONG, Toast.TOP);
+                    Toast.showWithGravity('User not found. Try again..', Toast.LONG, Toast.TOP);
                 }
             }).catch(error => {
             console.log('ERROR > ', error);
@@ -26,55 +42,60 @@ function PlayerLeagues({navigation, user}) {
     }
 
     return (
-        <View>
-            <Text style={styles.text}>Leagues - {user.name}</Text>
-            <View style={styles.tableContainer}>
-                <View style={styles.tableMain}>
-                    <Text style={styles.tableSecondaryHeading}>Classic leagues</Text>
-                    <View style={styles.tableHeader}>
-                        <Text style={styles.tableTextFirst}>League</Text>
-                        <Text style={styles.tableTextRankFirst}></Text>
-                        <Text style={styles.tableText}>Current Rank</Text>
-                        <Text style={styles.tableText}>Last Rank</Text>
-                    </View>
-
-                    {user.leagues.classic.map((league, index) => {
-                        return (
-
-                            <Pressable onPress={() => findLeagueAndNavigate(league.id)} style={styles.tableHeader}>
-                                <Text style={styles.tableTextFirstBody}>{league.name}</Text>
-                                <Text
-                                    style={[styles.tableTextRank, league.entry_rank < league.entry_last_rank ? styles.greenCircle : styles.redCircle, league.entry_rank == league.entry_last_rank && styles.grayCircle]}></Text>
-                                <Text style={styles.tableTextBody}>{league.entry_rank}</Text>
-                                <Text style={styles.tableTextBody}>{league.entry_last_rank}</Text>
-                            </Pressable>
-                        )
-                    })}
+        <SafeAreaView style={styles.heightWindow}>
+            <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
+                <View style={styles.stickyHeader}>
+                    <Text style={[styles.text, styles.leagueHeading]}>Standings</Text>
                 </View>
-                <View style={styles.tableMain}>
-                    <Text style={styles.tableSecondaryHeading}>H2H leagues</Text>
-                    <View style={styles.tableHeader}>
-                        <Text style={styles.tableTextFirst}>League</Text>
-                        <Text style={styles.tableTextRankFirst}></Text>
-                        <Text style={styles.tableText}>Current Rank</Text>
-                        <Text style={styles.tableText}>Last Rank</Text>
-                    </View>
 
-                    {user.leagues.h2h.map((league, index) => {
-                        return (
-                            <View style={styles.tableHeader}>
-                                <Text style={styles.tableTextFirstBody}>{league.name}</Text>
-                                <Text
-                                    style={[styles.tableTextRank, league.entry_rank < league.entry_last_rank ? styles.greenCircle : styles.redCircle, league.entry_rank == league.entry_last_rank && styles.grayCircle]}></Text>
-                                <Text style={styles.tableTextBody}>{league.entry_rank}</Text>
-                                <Text style={styles.tableTextBody}>{league.entry_last_rank}</Text>
+                <View style={styles.tableContainer}>
+                    <View style={styles.tableMain}>
+                        <Text style={styles.tableSecondaryHeading}>{route.params.league.league.name}</Text>
+                        <View style={[styles.tableHeader, styles.tableHeaderBg]}>
+                            <View style={styles.tableHeaderFlex}>
+                                <Text style={[styles.tableTextPos, styles.width25]}>Pos</Text>
+                                <Text style={[styles.tableTextTeam]}>Team</Text>
                             </View>
-                        )
-                    })}
+                            <View style={styles.tableHeaderFlex}>
+                                <Text style={styles.tableText}>GM3</Text>
+                                <Text style={[styles.tableText, styles.marginLeft50, styles.width30]}>Total</Text>
+                            </View>
+                        </View>
+
+                        {route.params.league.standings.results.map((player, index) => {
+                            return (
+
+                                <View
+                                    style={styles.tableHeader}>
+                                    <View style={styles.tableHeaderFlex}>
+                                        <View style={[styles.tableHeaderFlex, styles.width25]}>
+                                            <Text
+                                                style={[styles.tableTextRank, player.rank < player.last_rank ? styles.greenCircle : styles.redCircle, player.rank == player.last_rank && styles.grayCircle]}></Text>
+                                            <Text style={styles.tableTextFirstBody}>{player.rank}</Text>
+                                        </View>
+                                        <TouchableOpacity style={[styles.tableHeaderPlayerName]} onPress={() => {
+                                            login(player.entry);
+                                        }}>
+                                            <Text style={styles.tableTextBody}>{player.entry_name}</Text>
+                                            <Text
+                                                style={[styles.tableTextBody, styles.notBold]}>{player.player_name}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={styles.tableHeaderFlex}>
+                                        <Text
+                                            style={[styles.tableTextBody, styles.notBold]}>{player.event_total}</Text>
+                                        <Text
+                                            style={[styles.tableTextBody, styles.marginLeft50, styles.width30]}>{player.total}</Text>
+                                    </View>
+
+                                </View>
+                            )
+                        })}
+                    </View>
                 </View>
-            </View>
-        </View>
-    )
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -126,7 +147,7 @@ const styles = StyleSheet.create({
         color: '#7a7a7a',
         fontWeight: '700',
         fontSize: 10,
-        width: '25%',
+
     },
     tableTextHeader: {
         color: '#37003c',
@@ -137,11 +158,20 @@ const styles = StyleSheet.create({
         width: 8,
         marginHorizontal: 30
     },
+    tableHeaderFlex: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     tableTextRank: {
         width: 8,
         height: 8,
         borderRadius: 8 / 2,
-        marginHorizontal: 30
+        marginRight: 10
+    },
+    tableHeaderPlayerName: {
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        textAlign: 'right',
     },
     tableTextRank2: {
         marginRight: 8,
@@ -159,19 +189,39 @@ const styles = StyleSheet.create({
         backgroundColor: '#FC2C80',
     },
     tableTextFirst: {
-        width: '40%',
         color: '#7a7a7a',
         fontWeight: '700',
         fontSize: 10,
+    },
+    tableTextPos: {
+        color: '#7a7a7a',
+        fontWeight: '700',
+        fontSize: 10,
+    },
+    tableTextTeam: {
+        color: '#7a7a7a',
+        fontWeight: '700',
+        fontSize: 10,
+    },
+    width25: {
+        width: 60
+    },
+    width30: {
+        width: 30,
+    },
+    marginLeft50: {
+        marginLeft: 25,
     },
     tableTextBody: {
         color: '#37003c',
         fontWeight: '700',
         fontSize: 12,
-        width: '25%',
+        textAlign: 'left',
+    },
+    notBold: {
+        fontWeight: '400'
     },
     tableTextFirstBody: {
-        width: '40%',
         color: '#37003c',
         fontWeight: '700',
         fontSize: 12,
@@ -205,7 +255,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderBottomWidth: 0.2,
         borderBottomColor: '#7a7a7a',
-        paddingVertical: 8
+        paddingVertical: 8,
     },
     cell: {
         borderWidth: 1,
@@ -339,10 +389,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 8,
     },
+    leagueHeading: {
+        color: '#37003c',
+    },
+    stickyHeader: {
+        flexDirection: 'row',
+
+        alignItems: 'center',
+        padding: 8,
+        backgroundColor: '#00ff87',
+    },
     teamCaptain: {
         width: 14,
         height: 14,
-        borderRadius: 14/2,
+        borderRadius: 14 / 2,
         fontSize: 8,
         backgroundColor: 'black',
         color: 'white',
@@ -354,7 +414,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center',
     }
+
 });
 
-
-export default PlayerLeagues;
+export default LeagueScreen;
