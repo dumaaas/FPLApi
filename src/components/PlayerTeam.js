@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import TeamPosition from "../components/TeamPosition";
+import PlayerData from "../components/PlayerData";
 
 let ScreenHeight = Dimensions.get("window").height;
 
@@ -28,6 +29,8 @@ function PlayerTeam({user, bootstrapStatic, livePlayerData}) {
     const [getMidfielders, setMidfielders] = useState([]);
     const [getBench, setBench] = useState([]);
     const [getForwards, setForwards] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [fullPlayerData, setFullPlayerData] = useState({});
 
     const findManagerTeam = () => {
         getManagerTeam(user.id, user.current_event).then(res => res.json())
@@ -87,13 +90,14 @@ function PlayerTeam({user, bootstrapStatic, livePlayerData}) {
             <ImageBackground source={require('../../src/images/court.png')}
                              style={{width: '100%', height: '90%'}}>
                 <View style={styles.playersCourt}>
-                    <TeamPosition team={getGoalkeepers} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
-                    <TeamPosition team={getDefenders} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
-                    <TeamPosition team={getMidfielders} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
-                    <TeamPosition team={getForwards} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
-                    <TeamPosition team={getBench} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={true}/>
+                    <TeamPosition setFullPlayerData={setFullPlayerData} setModalVisible={setModalVisible} team={getGoalkeepers} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
+                    <TeamPosition setFullPlayerData={setFullPlayerData} setModalVisible={setModalVisible} team={getDefenders} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
+                    <TeamPosition setFullPlayerData={setFullPlayerData} setModalVisible={setModalVisible} team={getMidfielders} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
+                    <TeamPosition setFullPlayerData={setFullPlayerData} setModalVisible={setModalVisible} team={getForwards} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={false}/>
+                    <TeamPosition setFullPlayerData={setFullPlayerData} setModalVisible={setModalVisible} team={getBench} bootstrapStatic={bootstrapStatic} livePlayerData={livePlayerData} isBench={true}/>
                 </View>
             </ImageBackground>
+            {Object.keys(fullPlayerData).length > 0 && <PlayerData player={fullPlayerData} modalVisible={modalVisible} setModalVisible={setModalVisible}/>}
         </View>
 
     )

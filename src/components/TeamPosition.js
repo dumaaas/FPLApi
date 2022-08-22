@@ -3,10 +3,11 @@ import {
     StyleSheet,
     Text,
     View,
-    Image
+    Image,
+    Pressable
 } from 'react-native';
 
-function TeamPosition({team, bootstrapStatic, livePlayerData, isBench}) {
+function TeamPosition({setFullPlayerData, setModalVisible, team, bootstrapStatic, livePlayerData, isBench}) {
     const findOpponentTeam = (player) => {
         var player = findPlayerBootstrapDataById(player.element);
         var team = {};
@@ -39,36 +40,48 @@ function TeamPosition({team, bootstrapStatic, livePlayerData, isBench}) {
         return livePlayer;
     }
 
+    const constructPlayerData = (playerArg) => {
+        var player = {};
+        player.bootstrapStatic = findPlayerBootstrapDataById(playerArg.element);
+        player.livePlayerData = findPlayerLiveData(playerArg.element);
+        player.team = findOpponentTeam(playerArg);
+        setFullPlayerData(player);
+    };
+
     return (
         <View style={isBench ? styles.benchCourt : styles.defendersCourt}>
             {
                 team.map((player, index) => {
                     var bootstrapPlayer = findPlayerBootstrapDataById(player.element);
                     var livePlayer = findPlayerLiveData(player.element);
-                    console.log(isBench,'hehe');
 
                     return (
-                        <View style={styles.playerCard}>
-                            {player.is_captain && <Text style={styles.teamCaptain}>
-                                C
-                            </Text>}
-                            {player.is_vice_captain && <Text style={styles.teamCaptain}>
-                                V
-                            </Text>}
-                            <Text style={styles.playerPoints}>{player.is_captain ? JSON.stringify(livePlayer.stats.total_points)*2 : JSON.stringify(livePlayer.stats.total_points)}</Text>
-                            <Image
-                                style={{
-                                    resizeMode: 'contain',
-                                    alignSelf: 'center',
-                                }}
-                                style={{ width: 40, height: 60 }}
-                                source={{uri: 'https://resources.premierleague.com/premierleague/photos/players/110x140/p'+bootstrapPlayer.code+'.png'}}
-                            />
-                            <View style={styles.playerCardBottom}>
-                                <Text style={styles.playerName}>{bootstrapPlayer.web_name.length > 10 ? bootstrapPlayer.web_name.substring(0, 10)+'..' : bootstrapPlayer.web_name}</Text>
-                                <Text style={styles.playerTeam}>{findOpponentTeam(player).short_name}</Text>
+                        <Pressable onPress={() => {
+                            setModalVisible(true);
+                            constructPlayerData(player);
+                        }}>
+                            <View style={styles.playerCard}>
+                                {player.is_captain && <Text style={styles.teamCaptain}>
+                                    C
+                                </Text>}
+                                {player.is_vice_captain && <Text style={styles.teamCaptain}>
+                                    V
+                                </Text>}
+                                <Text style={styles.playerPoints}>{player.is_captain ? JSON.stringify(livePlayer.stats.total_points)*2 : JSON.stringify(livePlayer.stats.total_points)}</Text>
+                                <Image
+                                    style={{
+                                        resizeMode: 'contain',
+                                        alignSelf: 'center',
+                                    }}
+                                    style={{ width: 40, height: 60 }}
+                                    source={{uri: 'https://resources.premierleague.com/premierleague/photos/players/110x140/p'+bootstrapPlayer.code+'.png'}}
+                                />
+                                <View style={styles.playerCardBottom}>
+                                    <Text style={styles.playerName}>{bootstrapPlayer.web_name.length > 10 ? bootstrapPlayer.web_name.substring(0, 10)+'..' : bootstrapPlayer.web_name}</Text>
+                                    <Text style={styles.playerTeam}>{findOpponentTeam(player).short_name}</Text>
+                                </View>
                             </View>
-                        </View>
+                        </Pressable>
                     );
                 })
             }
@@ -304,7 +317,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     defendersCourt: {
-        marginBottom: 20,
+        marginBottom: 33.3,
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
@@ -320,15 +333,18 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         backgroundColor: 'white',
-        backgroundColor: 'rgba(255,255,255,0.5)'
+        backgroundColor: 'rgba(0,0,0,0.5)'
     },
     playerCard: {
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
     playerCardBottom: {
         width: 60,
-        marginTop: 8,
+
         textAlign: 'center'
     },
     playerName: {
