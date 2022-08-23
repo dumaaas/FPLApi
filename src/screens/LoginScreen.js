@@ -58,6 +58,18 @@ function LoginScreen({navigation}) {
             id: 5552932
         },
         {
+            name: 'Nemanja Pejakovic',
+            id: 3571625
+        },
+        {
+          name: 'Bojan Vojinovic',
+          id: 4155253
+        },
+        {
+            name: 'Ilija Dumnic',
+            id: 5724576
+        }
+        {
             name: 'Strahinja Kovacevic',
             id: 4157253
         },
